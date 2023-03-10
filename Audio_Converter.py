@@ -2,6 +2,9 @@ import librosa
 import matplotlib.pyplot as plt
 import numpy as np
 from math import*
+import os
+import moviepy.video.io.ImageSequenceClip
+from moviepy.editor import *
 
 class AC(): #Audio Converter
 
@@ -64,3 +67,13 @@ class AC(): #Audio Converter
             name="./Image_gen/"+str(i)+".png"
             plt.savefig(name)
             plt.close()
+
+    def images_to_video(self,image_folder_path,extension, video_name, output_format, audioclip): #converti séquence image en vidéos
+        images = [image_folder_path+'/'+img for img in os.listdir(image_folder_path) if img.endswith(extension)]
+        movie_clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(images, self.FPS)
+        movie_clip.write_videofile(video_name+output_format)
+        videoclip = VideoFileClip("./Video_gen/Sequence.mp4")
+        audioclip = AudioFileClip(audioclip)
+        new_audioclip = CompositeAudioClip([audioclip])
+        videoclip.audio = new_audioclip
+        videoclip.write_videofile("./Video_gen/"+video_name+"_with_sound"+output_format)

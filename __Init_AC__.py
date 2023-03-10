@@ -1,9 +1,10 @@
 from Audio_Converter import*
 import librosa
-PATH="./Test.wav"
+PATH="./Sound/Test.wav"
 
 f, fs = librosa.load(PATH)
-ac= AC(30,fs,f[:fs])
+ac= AC(30,fs,f)
 
-ac.image_generator(2500)
+#ac.image_generator(4000)
 
+ac.images_to_video("./Image_gen",".png","Sequence",".mp4", PATH)
