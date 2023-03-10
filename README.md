@@ -14,3 +14,4 @@ Etat actuel du programme :
 
 Le programme est capable d'identifier les fréquences d'un fichier audio de longueurs quelconques et avec des notes superposées grâce à l'algorithme FFT.
 Il peut générer une séquence d'image représentant l'évolution temporel du spectre audio.
+Les images générées sont stockées dans le dossier Image_gen et sont numérotées dans l'ordre chronologique.
