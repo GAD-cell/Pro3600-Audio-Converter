@@ -20,10 +20,20 @@ class AC(): #Audio Converter
         return(normalized)
 
     def FFT(self,f): #on implementera notre propre algorithme FFT plus tard
-        fft=np.fft.fft(self.f,len(self.f))
+        fft=np.fft.fft(f,len(f))
         fft=np.abs(fft).real
         fft=self.normalize(fft)
         return(fft)
+    
+    def analyze(self): #partitionne l'audio en fonction des FPS qu'on a choisit afin de faire l'analyse de fourier sur chaque portion
+        FFTS=[] 
+        time=len(self.f)/self.fs
+        image_count=floor(time*self.FPS)
+
+        for i in range(image_count):
+            FFTS.append(self.FFT(self.f[floor(i*len(self.f)/image_count):floor((i+1)*len(self.f)/image_count)]))
+        
+        return(FFTS)
     
     def visualize(self,f): #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f)
@@ -43,10 +53,14 @@ class AC(): #Audio Converter
         plt.xlabel('Fréquence(Hertz)')
         plt.show()
     
-    def analyze(self): #partitionne l'audio en fonction des FPS qu'on a choisit afin de faire l'analyse de fourier sur chaque portion
-        FFTS=[] 
-        time=len(self.f)/self.fs
-        image_count=floor(time*self.FPS)
-
-        for i in range(image_count):
-            FFTS.append(self.FFT(self.f[floor(i*len(self.f)/image_count):floor((i+1)*len(self.f)/image_count)]))
+    def image_generator(self,fmax): #génère une séquence d'image représentant l'évolution du spectre audio dans le temps
+        FFTS=self.analyze()
+        Pxx=[j*self.fs/floor(self.fs/self.FPS) for j in range(floor(self.fs/self.FPS))]
+        x=[num for num in Pxx if num<=fmax]
+        for i in range(len(FFTS)):
+            plt.plot(x,FFTS[i][:len(x)], linewidth=2)
+            plt.ylabel('Magnitude')
+            plt.xlabel('Fréquence(Hertz)')
+            name="./Image_gen/"+str(i)+".png"
+            plt.savefig(name)
+            plt.close()
