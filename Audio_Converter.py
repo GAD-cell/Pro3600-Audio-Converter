@@ -71,7 +71,7 @@ class AC(): #Audio Converter
     def images_to_video(self,image_folder_path,extension, video_name, output_format, audioclip): #converti séquence image en vidéos
         images = [image_folder_path+'/'+img for img in os.listdir(image_folder_path) if img.endswith(extension)]
         movie_clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(images, self.FPS)
-        movie_clip.write_videofile(video_name+output_format)
+        movie_clip.write_videofile("./Video_gen/"+video_name+output_format)
         videoclip = VideoFileClip("./Video_gen/Sequence.mp4")
         audioclip = AudioFileClip(audioclip)
         new_audioclip = CompositeAudioClip([audioclip])
