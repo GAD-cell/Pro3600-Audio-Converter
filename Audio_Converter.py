@@ -5,10 +5,10 @@ from math import*
 
 class AC(): #Audio Converter
 
-    def __init__(self, FPS, FS, f) : #Résolution de l'analyse , fréquence d'échantillonage, chemin du fichier audio
+    def __init__(self, FPS, FS, f) : #Résolution de l'analyse , fréquence d'échantillonage, audio pré-chargé
         self.FPS=FPS
         self.fs=FS
-        self.f=f #audio chargé, on prend la fréquence d'échantillonage de librosa pour commencer (22050 hz)
+        self.f=f #on prend la fréquence d'échantillonage de librosa pour commencer (22050 hz)
 
     def normalize(self,f): #normalise les amplitudes de l'audio
         max=0
