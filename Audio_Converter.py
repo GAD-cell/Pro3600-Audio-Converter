@@ -34,13 +34,19 @@ class AC(): #Audio Converter
         plt.xlabel('Temps(sec)')
         plt.show()
    
-    def visualize_FFT(self,f,fmax): #visualise la transormée de fourier jusqu'à fmax
+    def visualize_FFT(self,fft,fmax): #visualise la transormée de fourier jusqu'à fmax
         Pxx=[i*self.fs/len(self.f) for i in range(len(self.f))]
-        Test=[num for num in Pxx if num<=fmax]
+        x=[num for num in Pxx if num<=fmax]
         fig,ax = plt.subplots()
-        plt.plot(Test,f[:len(Test)], linewidth=2)
+        plt.plot(x,fft[:len(x)], linewidth=2)
         plt.ylabel('Magnitude')
         plt.xlabel('Fréquence(Hertz)')
         plt.show()
     
-    #def analyze(self):s
+    def analyze(self): #partitionne l'audio en fonction des FPS qu'on a choisit afin de faire l'analyse de fourier sur chaque portion
+        FFTS=[] 
+        time=len(self.f)/self.fs
+        image_count=floor(time*self.FPS)
+
+        for i in range(image_count):
+            FFTS.append(self.FFT(self.f[floor(i*len(self.f)/image_count):floor((i+1)*len(self.f)/image_count)]))
