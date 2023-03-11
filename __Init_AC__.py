@@ -1,6 +1,5 @@
 from Audio_Converter import*
 import librosa
-import numpy as np
 PATH="./Sound/Test.wav"
 
 f, fs = librosa.load(PATH,sr=44100)

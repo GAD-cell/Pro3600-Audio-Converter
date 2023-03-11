@@ -1,8 +1,6 @@
-import librosa
 import matplotlib.pyplot as plt
 import numpy as np
 from math import*
-import os
 import moviepy.video.io.ImageSequenceClip
 from moviepy.editor import *
 
@@ -12,7 +10,6 @@ class AC(): #Audio Converter
         self.FPS=FPS
         self.fs=FS
         self.f=f
-        self.max_f=0.00001
 
     def normalize_f(self):
         fft=np.fft.fft(self.f,len(self.f))
