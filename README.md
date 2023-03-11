@@ -28,6 +28,8 @@
     
     Améliorer la résolution fréquentiel qui est pour l'instant d'environ 30Hz (fe/N) par séquence audio. Pour les octaves en dessous de 4, cette résolution est trop faible.
 
+    Penser à un algorithme de partitionnement de l'audio plus intelligent afin qu'il ne coupe pas l'audio sur un pique de fréquence.
+
 --Notes et améliorations :
     
     
