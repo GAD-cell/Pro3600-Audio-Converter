@@ -40,4 +40,10 @@
     
     L'audio étant coupé en séquence de 1/FPS secondes, il y avait un fort étalement des fréquences sur le spectre. Il a donc fallu procéder à un fenêtrage en utilisant la fonction Hann. Cela a nettement amélioré la précision du spectre.
     
-    Il a fallu aussi soustraire la moyenne du signal temporel au signal d'entrée afin de s'assurer qu'aucun 'offset' n'était envoyé lors de l'execution de l'algo FFT.
+    Il a fallu aussi soustraire la moyenne du signal temporel au signal d'entrée afin de s'assurer qu'aucun 'offset' n'était envoyé lors de l'execution de l'algo FFT
+   
+--Liens et ressources : 
+    
+    https://www.tek.com/en/documents/primer/understanding-fft-overlap-processing-fundamentals-0
+    https://dlbeer.co.nz/articles/fftvis.html
+    https://ccrma.stanford.edu/~jos/sasp/Overlap_Add_OLA_STFT_Processing.html
