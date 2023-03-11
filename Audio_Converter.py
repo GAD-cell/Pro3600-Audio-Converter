@@ -3,6 +3,7 @@ import numpy as np
 from math import*
 import moviepy.video.io.ImageSequenceClip
 from moviepy.editor import *
+import os
 
 class AC(): #Audio Converter
 
@@ -55,7 +56,7 @@ class AC(): #Audio Converter
         window_begin=floor(self.fs*self.window_size)
         bottom=0
         top=window_begin
-        for i in range(image_count):
+        while top<=len(self.f):
             #print(str(bottom)+"/////"+str(top))
             FFTS.append(self.FFT(self.f[bottom:top],windowing))
             bottom+=floor(self.fs/self.FPS)
@@ -71,7 +72,6 @@ class AC(): #Audio Converter
             FFTS[i]=FFTS[i]/max
         return(FFTS)
            
-
     def visualize(self,f): #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f)
         Pxx=[i/self.fs for i in range(len(self.f))]
@@ -103,7 +103,7 @@ class AC(): #Audio Converter
             plt.ylim([0,1])
             plt.ylabel('Magnitude')
             plt.xlabel('Fréquence(Hertz)')
-            name="./Image_gen/"+str(i)+".png"
+            name="./Image_gen/"+"{:03d}".format(i)+".png" #permet d'enregistrer avec un affiche de type 000 afin que les images soient dans l'ordre
             plt.savefig(name)
             plt.close()
 
