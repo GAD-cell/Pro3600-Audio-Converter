@@ -15,11 +15,12 @@
     Le programme est capable d'identifier les fréquences d'un fichier audio de longueurs quelconques et avec des notes superposées grâce à l'algorithme FFT.
     Il peut générer une séquence d'image représentant l'évolution temporel du spectre audio.
     Les images générées sont stockées dans le dossier Image_gen et sont numérotées dans l'ordre chronologique.
+    Les images sont converties en fichier vidéo .mp4 avec le son correspondant afin de s'assurer de la cohérence des piques avec le son.
 
 --Evolution à venir :
 
-    générer une vidéo à partir des images produites.
     création d'un tableau de conversion entre fréquence et notes de musique.
+    Implémenter l'algorithme FFT
 
 --Notes et améliorations :
     
