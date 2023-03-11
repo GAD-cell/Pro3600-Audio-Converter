@@ -103,7 +103,7 @@ class AC(): #Audio Converter
             plt.ylim([0,1])
             plt.ylabel('Magnitude')
             plt.xlabel('Fréquence(Hertz)')
-            name="./Image_gen/"+"{:03d}".format(i)+".png" #permet d'enregistrer avec un affiche de type 000 afin que les images soient dans l'ordre
+            name="./Image_gen/"+"{:03d}".format(i)+".png" #permet d'enregistrer avec un affichage de type 000 afin que les images soient dans l'ordre
             plt.savefig(name)
             plt.close()
 
