@@ -49,7 +49,7 @@ class AC(): #Audio Converter
             FFTS[i]=FFTS[i]/max
         return(FFTS)
     
-    def analyze_V2(self, windowing):
+    def analyze_V2(self, windowing): #algorithme de partition par fenêtre qui se décale d'un certain offset à chaque pas
         FFTS=[] 
         time=len(self.f)/self.fs
         image_count=floor(time*self.FPS)
@@ -57,7 +57,6 @@ class AC(): #Audio Converter
         bottom=0
         top=window_begin
         while top<=len(self.f):
-            #print(str(bottom)+"/////"+str(top))
             FFTS.append(self.FFT(self.f[bottom:top],windowing))
             bottom+=floor(self.fs/self.FPS)
             top+=floor(self.fs/self.FPS)
