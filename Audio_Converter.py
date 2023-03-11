@@ -6,22 +6,17 @@ from moviepy.editor import *
 
 class AC(): #Audio Converter
 
-    def __init__(self, FPS, FS, f) : #Résolution de l'analyse , fréquence d'échantillonage, audio pré-chargé
+    def __init__(self, FPS, FS, f,window_size) : #Résolution de l'analyse , fréquence d'échantillonage, audio pré-chargé
         self.FPS=FPS
         self.fs=FS
         self.f=f
+        self.window_size = window_size
 
-    def normalize_f(self):
-        fft=np.fft.fft(self.f,len(self.f))
-        max=0
-        f_abs=np.abs(fft).real
-        for i in range(len(self.f)):
-            if f_abs[i]>max:
-                max=f_abs[i]
-        self.max_f=max
-    
     def normalize(self,f): #normalise les amplitudes de l'audio       
-        normalized=f/self.max_f
+        for i in range(len(f)):
+            if f[i]>max:
+                max=f[i]      
+        normalized=f/max
         return(normalized)
 
     def FFT(self,f,windowing): #on implementera notre propre algorithme FFT plus tard
@@ -30,13 +25,13 @@ class AC(): #Audio Converter
             g=np.hanning(len(f))
             for i in range(len(f)):
                 l.append(f[i]*g[i])
-            fft=np.fft.fft(l,len(l))
+            fft=np.fft.rfft(l,len(l))
         else :
-            fft=np.fft.fft(f,len(f))
+            fft=np.fft.rfft(f,len(f))
         fft=np.abs(fft).real
         return(fft)
     
-    def analyze(self,windowing): #partitionne l'audio en fonction des FPS qu'on a choisit afin de faire l'analyse de fourier sur chaque portion
+    def analyze_V1(self,windowing): #partitionne l'audio en fonction des FPS qu'on a choisit afin de faire l'analyse de fourier sur chaque portion
         FFTS=[] 
         time=len(self.f)/self.fs
         image_count=floor(time*self.FPS)
@@ -53,6 +48,30 @@ class AC(): #Audio Converter
             FFTS[i]=FFTS[i]/max
         return(FFTS)
     
+    def analyze_V2(self, windowing):
+        FFTS=[] 
+        time=len(self.f)/self.fs
+        image_count=floor(time*self.FPS)
+        window_begin=floor(self.fs*self.window_size)
+        bottom=0
+        top=window_begin
+        for i in range(image_count):
+            print(str(bottom)+"/////"+str(top))
+            FFTS.append(self.FFT(self.f[bottom:top],windowing))
+            bottom+=floor(self.fs/self.FPS)
+            top+=floor(self.fs/self.FPS)
+
+        #on normalise l'ensemble des valeurs
+        max=np.amax(FFTS[0])
+        for i in range(1,len(FFTS)):
+            amax=np.amax(FFTS[i])
+            if amax>max :
+                max=amax
+        for i in range(len(FFTS)):
+            FFTS[i]=FFTS[i]/max
+        return(FFTS)
+           
+
     def visualize(self,f): #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f)
         Pxx=[i/self.fs for i in range(len(self.f))]
@@ -72,7 +91,7 @@ class AC(): #Audio Converter
         plt.show()
     
     def image_generator(self,fmax,windowing): #génère une séquence d'image représentant l'évolution du spectre audio dans le temps
-        FFTS=self.analyze(windowing)
+        FFTS=self.analyze_V1(windowing)
         Pxx=[j*self.fs/floor(self.fs/self.FPS) for j in range(floor(self.fs/self.FPS))]
         x=[num for num in Pxx if num<=fmax]
         for i in range(len(FFTS)):
@@ -93,5 +112,6 @@ class AC(): #Audio Converter
         new_audioclip = CompositeAudioClip([audioclip])
         videoclip.audio = new_audioclip
         videoclip.write_videofile("./Video_gen/"+video_name+"_with_sound"+output_format)
+
 
     
