@@ -8,7 +8,9 @@
 
     Le deuxième est __Init_AC__ et il permet d'initialiser le programme, cela nous permettra notamment de faire tout les tests
 
-    Les fichiers .wav et .mp3 servent à faire des tests sur les fonctions
+    Les fichiers .wav et .mp3 dans le dossier Sound servent à faire des tests sur les fonctions
+    
+    Les dossier Image_gen et Video_gen contiennent les images et vidéos des spectres audio qui ont été générées
 
 --Etat actuel du programme : 
 
