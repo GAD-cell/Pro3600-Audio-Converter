@@ -90,10 +90,13 @@ class AC(): #Audio Converter
         plt.xlabel('Fréquence(Hertz)')
         plt.show()
     
-    def image_generator(self,fmax,windowing): #génère une séquence d'image représentant l'évolution du spectre audio dans le temps
-        FFTS=self.analyze_V2(windowing)
-        #Pxx=[j*self.fs/floor(self.fs/self.FPS) for j in range(floor(self.fs/self.FPS))]
-        Pxx=[j*self.fs/floor(self.fs*self.window_size) for j in range(floor(self.fs*self.window_size))]
+    def image_generator(self,fmax,version,windowing): #génère une séquence d'image représentant l'évolution du spectre audio dans le temps
+        if version==1 :
+            FFTS=self.analyze_V1(windowing)
+            Pxx=[j*self.fs/floor(self.fs/self.FPS) for j in range(floor(self.fs/self.FPS))]
+        else:
+            FFTS=self.analyze_V2(windowing)
+            Pxx=[j*self.fs/floor(self.fs*self.window_size) for j in range(floor(self.fs*self.window_size))]
         x=[num for num in Pxx if num<=fmax]
         for i in range(len(FFTS)):
             plt.plot(x,FFTS[i][:len(x)], linewidth=2)
