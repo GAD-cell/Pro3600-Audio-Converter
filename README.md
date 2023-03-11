@@ -20,3 +20,7 @@
 
     générer une vidéo à partir des images produites.
     création d'un tableau de conversion entre fréquence et notes de musique.
+
+--Notes et améliorations :
+    Amélioration notable : les valeurs étaient normalisées sur chaque portion temporel de l'audio. La normalisation n'était donc pas représentative sur la séquence totale de l'audio lorsqu'on tout était mis à bout.
+    La solution a donc été de normaliser les valeurs uniquement après que l'entièreté des transformées de fourier ait été effectué sur toutes les séquences temporelles de l'audio
