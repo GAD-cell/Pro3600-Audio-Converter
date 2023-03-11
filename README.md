@@ -25,3 +25,5 @@
     
     Amélioration notable : les valeurs étaient normalisées sur chaque portion temporel de l'audio. La normalisation n'était donc pas représentative sur la séquence totale de l'audio lorsqu'on tout était mis à bout.
     La solution a donc été de normaliser les valeurs uniquement après que l'entièreté des transformées de fourier ait été effectué sur toutes les séquences temporelles de l'audio
+    L'audio étant coupé en séquence de 1/FPS secondes, il y avait un fort étalement des fréquences sur le spectre. Il a donc fallu procéder à un fenêtrage en utilisant la fonction Hann. Cela a nettement amélioré la précision du spectre.
+    Il a fallu aussi soustraire la moyenne du signal temporel au signal d'entrée afin de s'assurer qu'aucun 'offset' n'était envoyé lors de l'execution de l'algo FFT.
