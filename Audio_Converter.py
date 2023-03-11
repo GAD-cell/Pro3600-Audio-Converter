@@ -56,7 +56,7 @@ class AC(): #Audio Converter
         bottom=0
         top=window_begin
         for i in range(image_count):
-            print(str(bottom)+"/////"+str(top))
+            #print(str(bottom)+"/////"+str(top))
             FFTS.append(self.FFT(self.f[bottom:top],windowing))
             bottom+=floor(self.fs/self.FPS)
             top+=floor(self.fs/self.FPS)
@@ -91,8 +91,9 @@ class AC(): #Audio Converter
         plt.show()
     
     def image_generator(self,fmax,windowing): #génère une séquence d'image représentant l'évolution du spectre audio dans le temps
-        FFTS=self.analyze_V1(windowing)
-        Pxx=[j*self.fs/floor(self.fs/self.FPS) for j in range(floor(self.fs/self.FPS))]
+        FFTS=self.analyze_V2(windowing)
+        #Pxx=[j*self.fs/floor(self.fs/self.FPS) for j in range(floor(self.fs/self.FPS))]
+        Pxx=[j*self.fs/floor(self.fs*self.window_size) for j in range(floor(self.fs*self.window_size))]
         x=[num for num in Pxx if num<=fmax]
         for i in range(len(FFTS)):
             plt.plot(x,FFTS[i][:len(x)], linewidth=2)
