@@ -9,4 +9,3 @@ ac.image_generator(1000,windowing=False)
 
 ac.images_to_video("./Image_gen",".png","Sequence",".mp4", PATH)
 
-hola
