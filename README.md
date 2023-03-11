@@ -8,20 +8,36 @@
 
     Le deuxième est __Init_AC__ et il permet d'initialiser le programme, cela nous permettra notamment de faire tout les tests
 
-    Les fichiers .wav et .mp3 servent à faire des tests sur les fonctions
+    Les fichiers .wav et .mp3 dans le dossier Sound servent à faire des tests sur les fonctions
+    
+    Les dossier Image_gen et Video_gen contiennent les images et vidéos des spectres audio qui ont été générées
 
 --Etat actuel du programme : 
 
     Le programme est capable d'identifier les fréquences d'un fichier audio de longueurs quelconques et avec des notes superposées grâce à l'algorithme FFT.
+    
     Il peut générer une séquence d'image représentant l'évolution temporel du spectre audio.
+   
     Les images générées sont stockées dans le dossier Image_gen et sont numérotées dans l'ordre chronologique.
+    
+    Les images sont converties en fichier vidéo .mp4 avec le son correspondant afin de s'assurer de la cohérence des piques avec le son.
 
 --Evolution à venir :
 
-    générer une vidéo à partir des images produites.
     création d'un tableau de conversion entre fréquence et notes de musique.
+    
+    Implémenter l'algorithme FFT
+    
+    Améliorer la résolution fréquentiel qui est pour l'instant d'environ 30Hz (fe/N) par séquence audio. Pour les octaves en dessous de 4, cette résolution est trop faible.
+
+    Penser à un algorithme de partitionnement de l'audio plus intelligent afin qu'il ne coupe pas l'audio sur un pique de fréquence.
 
 --Notes et améliorations :
     
+    
     Amélioration notable : les valeurs étaient normalisées sur chaque portion temporel de l'audio. La normalisation n'était donc pas représentative sur la séquence totale de l'audio lorsqu'on tout était mis à bout.
     La solution a donc été de normaliser les valeurs uniquement après que l'entièreté des transformées de fourier ait été effectué sur toutes les séquences temporelles de l'audio
+    
+    L'audio étant coupé en séquence de 1/FPS secondes, il y avait un fort étalement des fréquences sur le spectre. Il a donc fallu procéder à un fenêtrage en utilisant la fonction Hann. Cela a nettement amélioré la précision du spectre.
+    
+    Il a fallu aussi soustraire la moyenne du signal temporel au signal d'entrée afin de s'assurer qu'aucun 'offset' n'était envoyé lors de l'execution de l'algo FFT.
