@@ -21,6 +21,8 @@
     Les images générées sont stockées dans le dossier Image_gen et sont numérotées dans l'ordre chronologique.
     
     Les images sont converties en fichier vidéo .mp4 avec le son correspondant afin de s'assurer de la cohérence des piques avec le son.
+    
+    L'alogrithme V2 d'analyse coupe désormais de manière plus intelligente l'audio, le signal de sortie a beaucoup moins de bruits tout en améliorant la résolution fréquentiel qui est maintenant de 4Hz pour une taille de fenêtre de 0.25sec.
 
 --Evolution à venir :
 
@@ -28,10 +30,6 @@
     
     Implémenter l'algorithme FFT
     
-    Améliorer la résolution fréquentiel qui est pour l'instant d'environ 30Hz (fe/N) par séquence audio. Pour les octaves en dessous de 4, cette résolution est trop faible.
-
-    Penser à un algorithme de partitionnement de l'audio plus intelligent afin qu'il ne coupe pas l'audio sur un pique de fréquence.
-
 --Notes et améliorations :
     
     
