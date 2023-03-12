@@ -83,13 +83,27 @@ class AC(): #Audio Converter
     
     def find_notes(self,fft,seuil): #trouve les notes sur le spectre audio
         FREQ=[]
-        ID={}
+        AMP={}
         for i in range(len(fft)):
             if fft[i]>seuil:
-                FREQ.append(i*self.fs/len(fft))
-                ID[i*self.fs/len(fft)]=i
-        return(FREQ,ID)
-                   
+                FREQ.append(i*self.fs/floor(self.fs*self.window_size))
+                AMP[i*self.fs/floor(self.fs*self.window_size)]=fft[i]
+        return(FREQ,AMP)
+    
+    def no_redundancy(self,fft,seuil):#supprime les notes redondantes
+        FREQ,AMP=self.find_notes(fft,seuil)
+        notes_amp={}
+        notes_freq={}
+        for freq in FREQ:
+            note=self.freq_to_note(freq)
+            if note in notes_amp and AMP[freq]>notes_amp[note]:
+                notes_amp[note]=AMP[freq]
+                notes_freq[note]=freq
+            elif note not in notes_amp:
+                notes_amp[note]=AMP[freq]
+                notes_freq[note]=freq
+        return(notes_amp,notes_freq)
+
     def visualize(self,f): #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f)
         Pxx=[i/self.fs for i in range(len(self.f))]
@@ -116,13 +130,13 @@ class AC(): #Audio Converter
             FFTS=self.analyze_V2(windowing)
             Pxx=[j*self.fs/floor(self.fs*self.window_size) for j in range(floor(self.fs*self.window_size))]
         x=[num for num in Pxx if num<=fmax]
+        
         for i in range(len(FFTS)):
             #affichage des notes
-            FREQ,ID=self.find_notes(FFTS[i],seuil=0.1)
-            notes=[self.freq_to_note(freq) for freq in FREQ]            
+            notes_amp,notes_freq=self.no_redundancy(FFTS[i],seuil=0.2)
             plt.plot(x,FFTS[i][:len(x)], linewidth=2)
-            for j in range(len(FREQ)):
-                plt.text(x=ID[FREQ[j]],y=FFTS[i][ID[FREQ[j]]],s=notes[j])
+            for note in notes_amp:
+                plt.text(x=notes_freq[note],y=notes_amp[note],s=note)
             #config de l'affichage
             plt.ylim([0,1])
             plt.xlim([10,fmax])
@@ -136,7 +150,7 @@ class AC(): #Audio Converter
         images = [image_folder_path+'/'+img for img in os.listdir(image_folder_path) if img.endswith(extension)]
         movie_clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(images, self.FPS)
         movie_clip.write_videofile("./Video_gen/"+video_name+output_format)
-        videoclip = VideoFileClip("./Video_gen/Sequence.mp4")
+        videoclip = VideoFileClip("./Video_gen/"+video_name+output_format)
         audioclip = AudioFileClip(audioclip)
         new_audioclip = CompositeAudioClip([audioclip])
         videoclip.audio = new_audioclip
