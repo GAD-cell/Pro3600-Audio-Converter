@@ -12,7 +12,8 @@ class AC(): #Audio Converter
         self.fs=FS
         self.f=f
         self.window_size = window_size
-
+        self.notes=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    
     def normalize(self,f): #normalise les amplitudes de l'audio       
         for i in range(len(f)):
             if f[i]>max:
@@ -20,6 +21,15 @@ class AC(): #Audio Converter
         normalized=f/max
         return(normalized)
 
+    def freq_to_midi(self,freq): #associe une fréquence à son nombre MIDI
+        midi=round(12*np.log2(freq/440) + 69)
+        return(midi)
+    
+    def freq_to_note(self,freq): #associe une fréquence à sa note de musique
+        midi=self.freq_to_midi(freq)
+        note=self.notes[int(midi%12)] + str(floor(midi/12-1))
+        return(note)
+    
     def FFT(self,f,windowing): #on implementera notre propre algorithme FFT plus tard
         if windowing :
             l=[]
@@ -70,7 +80,16 @@ class AC(): #Audio Converter
         for i in range(len(FFTS)):
             FFTS[i]=FFTS[i]/max
         return(FFTS)
-           
+    
+    def find_notes(self,fft,seuil): #trouve les notes sur le spectre audio
+        FREQ=[]
+        ID={}
+        for i in range(len(fft)):
+            if fft[i]>seuil:
+                FREQ.append(i*self.fs/len(fft))
+                ID[i*self.fs/len(fft)]=i
+        return(FREQ,ID)
+                   
     def visualize(self,f): #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f)
         Pxx=[i/self.fs for i in range(len(self.f))]
@@ -98,8 +117,15 @@ class AC(): #Audio Converter
             Pxx=[j*self.fs/floor(self.fs*self.window_size) for j in range(floor(self.fs*self.window_size))]
         x=[num for num in Pxx if num<=fmax]
         for i in range(len(FFTS)):
+            #affichage des notes
+            FREQ,ID=self.find_notes(FFTS[i],seuil=0.1)
+            notes=[self.freq_to_note(freq) for freq in FREQ]            
             plt.plot(x,FFTS[i][:len(x)], linewidth=2)
+            for j in range(len(FREQ)):
+                plt.text(x=ID[FREQ[j]],y=FFTS[i][ID[FREQ[j]]],s=notes[j])
+            #config de l'affichage
             plt.ylim([0,1])
+            plt.xlim([10,fmax])
             plt.ylabel('Magnitude')
             plt.xlabel('Fréquence(Hertz)')
             name="./Image_gen/"+"{:03d}".format(i)+".png" #permet d'enregistrer avec un affichage de type 000 afin que les images soient dans l'ordre
