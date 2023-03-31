@@ -86,42 +86,42 @@ class AC(): #Audio Converter
         return(FFTS)
     
     def find_notes(self,fft,seuil): #trouve les notes sur le spectre audio
-        FREQ=[]
-        AMP={}
+        FREQ=[]     #initialiser une liste vide (FREQ) pour y stocker les fréquences trouvées
+        AMP={}      #dictionnaire vide qui associera à chaque fréquence trouvée son amplitude correspondante
         for i in range(len(fft)):
             if fft[i]>seuil:
                 FREQ.append(i*self.fs/floor(self.fs*self.window_size))
-                AMP[i*self.fs/floor(self.fs*self.window_size)]=fft[i]
+                AMP[i*self.fs/floor(self.fs*self.window_size)]=fft[i]       #stocke l'amplitude correspondante à cette fréquence dans le dictionnaire
         return(FREQ,AMP)
     
     def no_redundancy(self,fft,seuil):#supprime les notes redondantes
-        FREQ,AMP=self.find_notes(fft,seuil)
+        FREQ,AMP=self.find_notes(fft,seuil)     #extraire les fréquences et amplitudes de toutes les notes dont l'amplitude est supérieure au seuil donné
         notes_amp={}
         notes_freq={}
-        for freq in FREQ:
+        for freq in FREQ:       #parcourt ces notes une par une et vérifie si elle est déjà présente dans les dictionnaires 
             note=self.freq_to_note(freq)
-            if note in notes_amp and AMP[freq]>notes_amp[note]:
+            if note in notes_amp and AMP[freq]>notes_amp[note]:     #compare l'amplitude de la note actuelle avec celle déjà présente et la remplace si l'ancienne est plus petite
                 notes_amp[note]=AMP[freq]
                 notes_freq[note]=freq
-            elif note not in notes_amp:
+            elif note not in notes_amp:     #Si la note n'est pas encore présente, elle l'ajoute aux dictionnaires avec son amplitude et sa fréquence
                 notes_amp[note]=AMP[freq]
                 notes_freq[note]=freq
         return(notes_amp,notes_freq)
 
     def visualize(self,f): #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f)
-        Pxx=[i/self.fs for i in range(len(self.f))]
-        fig,ax = plt.subplots()
-        plt.plot(Pxx,f, linewidth=2)
+        Pxx=[i/self.fs for i in range(len(self.f))]     # contient les valeurs du temps en secondes
+        fig,ax = plt.subplots()         #utilisé pour tracer des graphiques à l'intérieur de la figure
+        plt.plot(Pxx,f, linewidth=2)        #trace la courbe du signal audio f par rapport à Pxx
         plt.ylabel('Amplitude')
         plt.xlabel('Temps(sec)')
-        plt.show()
+        plt.show()      #affiche le tracé
    
     def visualize_FFT(self,fft,fmax): #visualise la transormée de fourier jusqu'à fmax
-        Pxx=[i*self.fs/len(self.f) for i in range(len(self.f))]
-        x=[num for num in Pxx if num<=fmax]
+        Pxx=[i*self.fs/len(self.f) for i in range(len(self.f))]     #créer une liste Pxx contenant les fréquences correspondant à chaque point de la FFT (en Hz)
+        x=[num for num in Pxx if num<=fmax]     #crée une nouvelle liste x qui ne contient que les fréquences inférieures ou égales à fmax
         fig,ax = plt.subplots()
-        plt.plot(x,fft[:len(x)], linewidth=2)
+        plt.plot(x,fft[:len(x)], linewidth=2)       #trace la FFT en fonction de la fréquence sur l'axe des abscisses et de la magnitude sur l'axe des ordonnées 
         plt.ylabel('Magnitude')
         plt.xlabel('Fréquence(Hertz)')
         plt.show()
