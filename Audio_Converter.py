@@ -129,7 +129,7 @@ class AC(): #Audio Converter
     def image_generator(self,fmax,version,windowing): #génère une séquence d'image représentant l'évolution du spectre audio dans le temps
         if version==1 :
             FFTS=self.analyze_V1(windowing)
-            Pxx=[j*self.fs/floor(self.fs/self.FPS) for j in range(floor(self.fs/self.FPS))]
+            Pxx=[j*self.fs/floor(self.fs/self.FPS) for j in range(floor(self.fs/self.FPS))]     #représente les fréquences à chaque point de l'axe horizontal, en fonction de la méthode d'analyse utilisée et de la fréquence d'échantillonnage fs de l'audio
         else:
             FFTS=self.analyze_V2(windowing)
             Pxx=[j*self.fs/floor(self.fs*self.window_size) for j in range(floor(self.fs*self.window_size))]
@@ -137,29 +137,29 @@ class AC(): #Audio Converter
         
         for i in range(len(FFTS)):
             #affichage des notes
-            notes_amp,notes_freq=self.no_redundancy(FFTS[i],seuil=0.2)
+            notes_amp,notes_freq=self.no_redundancy(FFTS[i],seuil=0.2)      #supprimer les redondances
             print(notes_amp)
-            plt.plot(x,FFTS[i][:len(x)], linewidth=2)
+            plt.plot(x,FFTS[i][:len(x)], linewidth=2)       #affiche ensuite le spectre audio avec plt.plot et les notes identifiées avec plt.text
             for note in notes_amp:
                 plt.text(x=notes_freq[note],y=notes_amp[note],s=note)
             #config de l'affichage
-            plt.ylim([0,1])
-            plt.xlim([10,fmax])
+            plt.ylim([0,1])     #afficher les fréquences 
+            plt.xlim([10,fmax])     #afficher magnitudes
             plt.ylabel('Magnitude')
             plt.xlabel('Fréquence(Hertz)')
             name="./Image_gen/"+"{:03d}".format(i)+".png" #permet d'enregistrer avec un affichage de type 000 afin que les images soient dans l'ordre
-            plt.savefig(name)
+            plt.savefig(name)       # enregistre chaque image générée avec un nom de fichier correspondant à son numéro dans la séquence
             plt.close()
 
-    def images_to_video(self,image_folder_path,extension, video_name, output_format, audioclip): #converti séquence image en vidéos
-        images = [image_folder_path+'/'+img for img in os.listdir(image_folder_path) if img.endswith(extension)]
-        movie_clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(images, self.FPS)
-        movie_clip.write_videofile("./Video_gen/"+video_name+output_format)
-        videoclip = VideoFileClip("./Video_gen/"+video_name+output_format)
+    def images_to_video(self,image_folder_path,extension, video_name, output_format, audioclip): #convertit séquence image en vidéos
+        images = [image_folder_path+'/'+img for img in os.listdir(image_folder_path) if img.endswith(extension)]    #n commence par récupérer tous les fichiers images présents dans le dossier spécifié par image_folder_path et ayant l'extension spécifiée par extension
+        movie_clip = moviepy.video.io.ImageSequenceClip.ImageSequenceClip(images, self.FPS)     #on crée un objet ImageSequenceClip de la bibliothèque MoviePy à partir de ces images avec une fréquence d'images de self.FPS
+        movie_clip.write_videofile("./Video_gen/"+video_name+output_format)     #On écrit ensuite cette séquence d'images dans un fichier vidéo dans le dossier "./Video_gen/" sous le nom spécifié par video_name et avec le format spécifié par output_format
+        videoclip = VideoFileClip("./Video_gen/"+video_name+output_format)      #On charge ensuite l'audio du fichier spécifié
         audioclip = AudioFileClip(audioclip)
-        new_audioclip = CompositeAudioClip([audioclip])
-        videoclip.audio = new_audioclip
-        videoclip.write_videofile("./Video_gen/"+video_name+"_with_sound"+output_format)
+        new_audioclip = CompositeAudioClip([audioclip])     #On crée un objet CompositeAudioClip avec cet audio chargé
+        videoclip.audio = new_audioclip         #On associe finalement l'objet CompositeAudioClip à la vidéo créée précédemment à l'aide de videoclip.audio
+        videoclip.write_videofile("./Video_gen/"+video_name+"_with_sound"+output_format)        # On écrit ensuite cette nouvelle vidéo, avec l'audio intégré, dans un fichier dans le dossier "./Video_gen/" sous le nom et le format spécifiés
 
 
     
