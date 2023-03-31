@@ -11,26 +11,26 @@ class AC(): #Audio Converter
         self.FPS=FPS
         self.fs=FS
         self.f=f
-        self.window_size = window_size
-        self.notes=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        self.window_size = window_size # définition de la taille de la fenêtre utilisée pour l'analyse
+        self.notes=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] #définit une liste de notes avec les noms des notes de la gamme chromatique occidentale standard
     
     def normalize(self,f): #normalise les amplitudes de l'audio       
-        for i in range(len(f)):
+        for i in range(len(f)):  #recherche de la valeur maximale de f
             if f[i]>max:
                 max=f[i]      
-        normalized=f/max
-        return(normalized)
+        normalized=f/max  #normalise chaque amplitude en la divisant par la valeur maximale.
+        return(normalized)  #permet de normaliser les amplitudes de l'audio afin que la plus grande amplitude soit de 1.0 et les autres amplitudes soient proportionnelles à celle-ci
 
     def freq_to_midi(self,freq): #associe une fréquence à son nombre MIDI
         if int(freq) != 0 :
-            midi=round(12*np.log2(freq/440) + 69)
+            midi=round(12*np.log2(freq/440) + 69)   #La formule de conversion utilise une opération de logarithme et une constante de référence de 440 Hz pour la note A4.
             return(midi)
         return(None)
     
-    def freq_to_note(self,freq): #associe une fréquence à sa note de musique
+    def freq_to_note(self,freq): #associe une fréquence à sa note de musique à l'aide d'une méthode de calcul standardisée
         midi=self.freq_to_midi(freq)
         if midi != None :
-            note=self.notes[int(midi%12)] + str(floor(midi/12-1))
+            note=self.notes[int(midi%12)] + str(floor(midi/12-1))  
             return(note)
         return (None)
     
