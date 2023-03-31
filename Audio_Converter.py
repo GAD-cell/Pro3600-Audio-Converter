@@ -22,13 +22,17 @@ class AC(): #Audio Converter
         return(normalized)
 
     def freq_to_midi(self,freq): #associe une fréquence à son nombre MIDI
-        midi=round(12*np.log2(freq/440) + 69)
-        return(midi)
+        if int(freq) != 0 :
+            midi=round(12*np.log2(freq/440) + 69)
+            return(midi)
+        return(None)
     
     def freq_to_note(self,freq): #associe une fréquence à sa note de musique
         midi=self.freq_to_midi(freq)
-        note=self.notes[int(midi%12)] + str(floor(midi/12-1))
-        return(note)
+        if midi != None :
+            note=self.notes[int(midi%12)] + str(floor(midi/12-1))
+            return(note)
+        return (None)
     
     def FFT(self,f,windowing): #on implementera notre propre algorithme FFT plus tard
         if windowing :
@@ -134,6 +138,7 @@ class AC(): #Audio Converter
         for i in range(len(FFTS)):
             #affichage des notes
             notes_amp,notes_freq=self.no_redundancy(FFTS[i],seuil=0.2)
+            print(notes_amp)
             plt.plot(x,FFTS[i][:len(x)], linewidth=2)
             for note in notes_amp:
                 plt.text(x=notes_freq[note],y=notes_amp[note],s=note)
