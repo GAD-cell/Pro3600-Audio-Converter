@@ -14,7 +14,7 @@ class AC(): #Audio Converter
         self.window_size = window_size               #définition de la taille de la fenêtre utilisée pour l'analyse
         self.notes=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] #définit une liste de notes avec les noms des notes de la gamme chromatique occidentale standard
     
-    def normalize(self,f):           #normalise les amplitudes de l'audio       
+    def normalize(self,f):           #normalise les amplitudes de l'audio en divisant chaque amplitude par la valeur maximale de l'audio     
         for i in range(len(f)):      #recherche de la valeur maximale de f
             if f[i]>max:
                 max=f[i]      
@@ -43,7 +43,7 @@ class AC(): #Audio Converter
             fft=np.fft.rfft(l,len(l))
         else :
             fft=np.fft.rfft(f,len(f))    #FFT calculée sur la liste l en utilisant la fonction np.fft.rfft qui calcule la transformée de Fourier rapide réelle
-        fft=np.abs(fft).real             #retourne le spectre de puissance en valeurs réelles calculé à partir de la FFT
+        fft=np.abs(fft).real           
         return(fft)
     
     def analyze_V1(self,windowing):         #partitionne l'audio en fonction des FPS qu'on a choisit afin de faire l'analyse de fourier sur chaque portion
@@ -53,7 +53,7 @@ class AC(): #Audio Converter
 
         for i in range(image_count):
             FFTS.append(self.FFT(self.f[floor(i*len(self.f)/image_count):floor((i+1)*len(self.f)/image_count)],windowing))  #our chaque segment, on utilise la fonction FFT pour calculer la transformée de Fourier de ce segment
-        #on normalise l'ensemble des valeurs
+        #on normalise l'ensemble des valeurs en divisant chaque amplitude par la valeur maximale de l'audio
         max=np.amax(FFTS[0])
         for i in range(1,len(FFTS)):   
             amax=np.amax(FFTS[i])
