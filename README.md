@@ -3,10 +3,13 @@
 --Instructions :
 
     L'algorithme sera codé en programmation orienté objet
+    
     On a donc un premier ficher Audio_Converter qui contient la class AC
     cette classe contiendra toutes les fonctions de notre algorithme de conversion
 
     Le deuxième est __Init_AC__ et il permet d'initialiser le programme, cela nous permettra notamment de faire tout les tests
+    
+    Le programme Test_FFT_Code permet de tester l'algorithme de transformer de fourier et de vérifier le taux d'erreur générer sur l'ensemble des superpositions de deux notes possible
 
     Les fichiers .wav et .mp3 dans le dossier Sound servent à faire des tests sur les fonctions
     
@@ -26,7 +29,9 @@
 
 --Evolution à venir :
 
-    création d'un tableau de conversion entre fréquence et notes de musique.
+    création d'un algorithme détéctant les harmoniques et ne les considérant pas comme des notes jouées
+    
+    trouver une manière d'avoir le tempo des notes jouées
     
     Implémenter l'algorithme FFT
     
