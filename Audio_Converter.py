@@ -35,27 +35,27 @@ class AC(): #Audio Converter
         return (None)
     
     def FFT(self,f,windowing): #on implementera notre propre algorithme FFT plus tard
-        if windowing :
+        if windowing :  #la fonction de fenêtrage est appliquée au signal et le signal fenêtré est stocké dans la liste l
             l=[]
-            g=np.hanning(len(f))
-            for i in range(len(f)):
+            g=np.hanning(len(f))    #utilise la fenêtre de Hanning pour appliquer une pondération sur les échantillons de l'audio pré-chargé
+            for i in range(len(f)): # parcourt tous les échantillons de l'audio pré-chargé, multiplie chacun par la valeur de la fenêtre à son indice, et stocke les résultats dans une nouvelle liste l
                 l.append(f[i]*g[i])
             fft=np.fft.rfft(l,len(l))
         else :
-            fft=np.fft.rfft(f,len(f))
-        fft=np.abs(fft).real
+            fft=np.fft.rfft(f,len(f))   #FFT calculée sur la liste l en utilisant la fonction np.fft.rfft qui calcule la transformée de Fourier rapide réelle
+        fft=np.abs(fft).real    # retourne le spectre de puissance en valeurs réelles calculé à partir de la FFT
         return(fft)
     
     def analyze_V1(self,windowing): #partitionne l'audio en fonction des FPS qu'on a choisit afin de faire l'analyse de fourier sur chaque portion
         FFTS=[] 
-        time=len(self.f)/self.fs
-        image_count=floor(time*self.FPS)
+        time=len(self.f)/self.fs    #En divisant la longueur totale de l'audio par sa fréquence d'échantillonnage, on obtient la durée totale en secondes
+        image_count=floor(time*self.FPS)    #calcule le nombre d'images ou de portions que l'on doit diviser l'audio en fonction de la fréquence de rafraîchissement par seconde (FPS) que l'on a choisi
 
         for i in range(image_count):
-            FFTS.append(self.FFT(self.f[floor(i*len(self.f)/image_count):floor((i+1)*len(self.f)/image_count)],windowing))
+            FFTS.append(self.FFT(self.f[floor(i*len(self.f)/image_count):floor((i+1)*len(self.f)/image_count)],windowing))  #our chaque segment, on utilise la fonction FFT pour calculer la transformée de Fourier de ce segment
         #on normalise l'ensemble des valeurs
         max=np.amax(FFTS[0])
-        for i in range(1,len(FFTS)):
+        for i in range(1,len(FFTS)):   
             amax=np.amax(FFTS[i])
             if amax>max :
                 max=amax
@@ -67,11 +67,11 @@ class AC(): #Audio Converter
         FFTS=[] 
         time=len(self.f)/self.fs
         image_count=floor(time*self.FPS)
-        window_begin=floor(self.fs*self.window_size)
-        bottom=0
-        top=window_begin
+        window_begin=floor(self.fs*self.window_size)    #détermine la taille de la fenêtre en nombre d'échantillons, en multipliant la fréquence d'échantillonnage (self.fs) par la taille de la fenêtre (self.window_size)
+        bottom=0    #indique le début de la fenêtre courante, qui correspond au premier échantillon de la fenêtre précédente, décalée d'un certain offset
+        top=window_begin    #ndique la fin de la fenêtre courante, qui correspond au dernier échantillon de la fenêtre précédente, décalée du même offset
         while top<=len(self.f):
-            FFTS.append(self.FFT(self.f[bottom:top],windowing))
+            FFTS.append(self.FFT(self.f[bottom:top],windowing))     #stocke ensuite chaque transformée de Fourier dans une liste appelée FFTS
             bottom+=floor(self.fs/self.FPS)
             top+=floor(self.fs/self.FPS)
 
