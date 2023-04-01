@@ -20,6 +20,13 @@ class AC(): #Audio Converter
                 max=f[i]      
         normalized=f/max             #normalise chaque amplitude en la divisant par la valeur maximale.
         return(normalized)           #permet de normaliser les amplitudes de l'audio afin que la plus grande amplitude soit de 1.0 et les autres amplitudes soient proportionnelles à celle-ci
+    
+    def remove(self,x,L):
+        S=[]
+        for y in L :
+            if y!= x :
+                S.append(y)
+        return S
 
     def freq_to_midi(self,freq):                     #associe une fréquence à son nombre MIDI
         if int(freq) != 0 :
@@ -43,7 +50,7 @@ class AC(): #Audio Converter
             fft=np.fft.rfft(l,len(l))
         else :
             fft=np.fft.rfft(f,len(f))    #FFT calculée sur la liste l en utilisant la fonction np.fft.rfft qui calcule la transformée de Fourier rapide réelle
-        fft=np.abs(fft).real           
+        fft=np.abs(fft).real    
         return(fft)
     
     def analyze_V1(self,windowing):         #partitionne l'audio en fonction des FPS qu'on a choisit afin de faire l'analyse de fourier sur chaque portion
@@ -107,6 +114,21 @@ class AC(): #Audio Converter
                 notes_amp[note]=AMP[freq]
                 notes_freq[note]=freq
         return(notes_amp,notes_freq)
+    
+    def no_harmonics(self,fft, seuil):#On enlève les harmoniques de chaque note utile
+        L= []
+        (notes_amp,notes_freq) = self.no_redundancy(fft,seuil)
+        for note_f,amp_f in notes_amp.items():#On crée une liste de toutes les notes
+            L.append(note_f)
+        for i in range (len(L)) :#On cherche les harmoniques de la i-ème note de la liste
+            for j in range(i+1,len(L)):
+                if L[j][0] == L[i][0]:#On compare la lettre de la i-ème note avec celle de la j-ème (ex A3 est une harmmonique de A1)
+                    n= int(L[j][1])-int(L[i][1])
+                    if notes_amp[L[j]]-0.10*notes_amp[L[j]] < (1/(n+1))*notes_amp[L[i]]: #On vérifie que la potentielle harmonique n'est pas une note utile en comparant son amplitude (marge d'erreur d'amplitude calculé de 10%)                                           avec l'amplitude théorique qu'aurait une harmonique
+                        del notes_amp[L[j]] #On enlève les harmoniques des dictionnaires et de L
+                        del notes_freq[L[j]]
+                        self.remove(L[j],L)
+        return(notes_amp, notes_freq)
 
     def visualize(self,f):      #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f)
@@ -137,8 +159,7 @@ class AC(): #Audio Converter
         
         for i in range(len(FFTS)):
             #affichage des notes
-            notes_amp,notes_freq=self.no_redundancy(FFTS[i],seuil=0.2)      #supprimer les redondances
-            print(notes_amp)
+            notes_amp,notes_freq=self.no_harmonics(FFTS[i],seuil=0.2)      #supprimer les redondances
             plt.plot(x,FFTS[i][:len(x)], linewidth=2)                       #affiche ensuite le spectre audio avec plt.plot et les notes identifiées avec plt.text
             for note in notes_amp:
                 plt.text(x=notes_freq[note],y=notes_amp[note],s=note)
