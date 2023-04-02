@@ -129,7 +129,7 @@ class AC(): #Audio Converter
                         del notes_freq[L[j]]
                         self.remove(L[j],L)
         return(notes_amp, notes_freq)
-
+hgbgh
     def visualize(self,f):      #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f)
         Pxx=[i/self.fs for i in range(len(self.f))]     #contient les valeurs du temps en secondes
