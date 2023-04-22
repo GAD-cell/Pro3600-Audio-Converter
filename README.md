@@ -29,11 +29,15 @@
 
 --Evolution à venir :
 
-    création d'un algorithme détéctant les harmoniques et ne les considérant pas comme des notes jouées
+    création d'un algorithme détéctant les harmoniques et ne les considérant pas comme des notes jouées : FAIT
     
     trouver une manière d'avoir le tempo des notes jouées
     
     Implémenter l'algorithme FFT
+    
+    Créer une interface javafx permettant d'executer le programme. 
+    Cette interface doit parcourir les fichiers de l'ordinateur, appliquer le code python à ce fichier 
+    et permettre le téléchargement du fichier en sortie du programme. 
     
 --Notes et améliorations :
     
