@@ -129,9 +129,29 @@ class AC(): #Audio Converter
                         del notes_freq[L[j]]
                         self.remove(L[j],L)
         return(notes_amp, notes_freq)
+    
+    def get_rythm(self, fmax, windowing,bpm,chiffrement):
+          séquence = []
+          FFTS=self.analyze_V2(windowing)
+          for i in range(len(FFTS)):
+              FFTS[i]=self.no_harmonics(FFTS[i],seuil=0.2)[0]
+          for i in range(len(FFTS)):
+              séquence.append([])
+              for note,amp in FFTS[i].item():
+                  occurence = 0
+                  compteur = i + 1
+                  while note in FFTS[compteur].keys : 
+                      occurence = occurence + 1 
+                      del FFTS[compteur][note]
+                      compteur = compteur + 1 
+                  temps=occurence*(1/self.FPS)
+                  rythme= (temps/(60/bpm))*(4/chiffrement[1])
+                  séquence[i].append([note,rythme])
+          return(séquence)
+        
 
     def visualize(self,f):      #visualise le fichier audio sur une partie de la bande son
-        f=self.normalize(f)
+        f=self.normalize(f) 
         Pxx=[i/self.fs for i in range(len(self.f))]     #contient les valeurs du temps en secondes
         fig,ax = plt.subplots()                         #utilisé pour tracer des graphiques à l'intérieur de la figure
         plt.plot(Pxx,f, linewidth=2)                    #trace la courbe du signal audio f par rapport à Pxx
