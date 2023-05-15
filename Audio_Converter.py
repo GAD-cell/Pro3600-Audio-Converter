@@ -144,7 +144,6 @@ class AC(): #Audio Converter
         return(notes_amp, notes_freq)
     
     def get_rythm(self, fmax, windowing,bpm,chiffrement):
-<<<<<<< HEAD
         séquence = []
         FFTS=self.analyze_V2(windowing)
         for i in range(len(FFTS)):
@@ -162,26 +161,6 @@ class AC(): #Audio Converter
                 rythme= (temps/(60/bpm))*(4/chiffrement[1])
                 séquence[i].append([note,rythme])
         return(séquence)
-=======
-          séquence = []
-          FFTS=self.analyze_V2(windowing)
-          for i in range(len(FFTS)):
-              FFTS[i]=self.no_harmonics(FFTS[i],seuil=0.2)[0]
-          for i in range(len(FFTS)):
-              séquence.append([])
-              for note,amp in FFTS[i].item():
-                  occurence = 0
-                  compteur = i + 1
-                  while note in FFTS[compteur].keys : 
-                      occurence = occurence + 1 
-                      del FFTS[compteur][note]
-                      compteur = compteur + 1 
-                  temps=occurence*(1/self.FPS)
-                  rythme= (temps/(60/bpm))*(4/chiffrement[1])
-                  séquence[i].append([note,rythme])
-          return(séquence)
-        
->>>>>>> 5244a97092cef5a649ac3545a5f574d9497171e5
 
     def visualize(self,f):      #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f) 
