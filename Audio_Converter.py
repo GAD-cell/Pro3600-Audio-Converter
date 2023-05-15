@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*- clear
 import matplotlib.pyplot as plt
 import numpy as np
 from math import*
@@ -40,6 +42,8 @@ class AC(): #Audio Converter
             note=self.notes[int(midi%12)] + str(floor(midi/12-1))  
             return(note)
         return (None)
+    
+
     
     def FFT(self,f,windowing):           #on implementera notre propre algorithme FFT plus tard
         if windowing :                   #la fonction de fenêtrage est appliquée au signal et le signal fenêtré est stocké dans la liste l
@@ -123,12 +127,40 @@ class AC(): #Audio Converter
         for i in range (len(L)) :#On cherche les harmoniques de la i-ème note de la liste
             for j in range(i+1,len(L)):
                 if L[j][0] == L[i][0]:#On compare la lettre de la i-ème note avec celle de la j-ème (ex A3 est une harmmonique de A1)
-                    n= int(L[j][1])-int(L[i][1])
-                    if notes_amp[L[j]]-0.10*notes_amp[L[j]] < (1/(n+1))*notes_amp[L[i]]: #On vérifie que la potentielle harmonique n'est pas une note utile en comparant son amplitude (marge d'erreur d'amplitude calculé de 10%)                                           avec l'amplitude théorique qu'aurait une harmonique
+                    if len(L[j])==3:
+                        if len(L[i])==3:
+                            n= int(L[j][2])-int(L[i][2])
+                        elif len(L[i])==2:
+                            n= int(L[j][2])-int(L[i][1])
+                    else : 
+                        if len(L[i])==3:
+                            n= int(L[j][1])-int(L[i][2])
+                        elif len(L[i])==2:
+                            n= int(L[j][1])-int(L[i][1])                        
+                    if notes_amp[L[j]]-0.10*notes_amp[L[j]] < (1/(n+1))*notes_amp[L[i]]: #On vérifie que la potentielle harmonique n'est pas une note utile en comparant son amplitude (marge d'erreur d'amplitude calculé de 10l;m!:,n%)                                           avec l'amplitude théorique qu'aurait une harmonique
                         del notes_amp[L[j]] #On enlève les harmoniques des dictionnaires et de L
                         del notes_freq[L[j]]
                         self.remove(L[j],L)
         return(notes_amp, notes_freq)
+    
+    def get_rythm(self, fmax, windowing,bpm,chiffrement):
+        séquence = []
+        FFTS=self.analyze_V2(windowing)
+        for i in range(len(FFTS)):
+            FFTS[i]=self.no_harmonics(FFTS[i],seuil=0.2)[0]
+        for i in range(len(FFTS)):
+            séquence.append([])
+            for note,amp in FFTS[i].item():
+                occurence = 0
+                compteur = i + 1
+                while note in FFTS[compteur].keys : 
+                    occurence = occurence + 1 
+                    del FFTS[compteur][note]
+                    compteur = compteur + 1 
+                temps=occurence*(1/self.FPS)
+                rythme= (temps/(60/bpm))*(4/chiffrement[1])
+                séquence[i].append([note,rythme])
+        return(séquence)
 
     def visualize(self,f):      #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f)

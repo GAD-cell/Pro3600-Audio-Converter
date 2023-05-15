@@ -53,3 +53,23 @@ def test_algo(sampling_rate):
 
 
 test_algo(sampling_rate=22050)                    
+
+
+    def FFT_calculate(self,f):
+
+        N = len(f)
+        if N % 2 ==1 :
+            f=f[0:N-1]
+    
+        if N == 1:
+            return f
+        else:
+            f_even = self.FFT_calculate(f[::2])
+            f_odd = self.FFT_calculate(f[1::2])
+            factor = \
+            np.exp(-2j*np.pi*np.arange(N)/ N)
+        
+            fft = np.concatenate(\
+                [f_even+factor[:int(N/2)]*f_odd,
+                f_even+factor[int(N/2):]*f_odd])
+        return fft
