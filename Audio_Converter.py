@@ -16,7 +16,11 @@ class AC(): #Audio Converter
         self.window_size = window_size               #définition de la taille de la fenêtre utilisée pour l'analyse
         self.notes=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] #définit une liste de notes avec les noms des notes de la gamme chromatique occidentale standard
         self.output_path = None
-        self.progress = 0
+        self.compteur = 0
+    
+    def progress(self):
+        time=len(self.f)/self.fs
+        return self.compteur/round(self.FPS*time)
     
     def normalize(self,f):           #normalise les amplitudes de l'audio en divisant chaque amplitude par la valeur maximale de l'audio     
         for i in range(len(f)):      #recherche de la valeur maximale de f
@@ -87,6 +91,8 @@ class AC(): #Audio Converter
             FFTS.append(self.FFT(self.f[bottom:top],windowing))     #stocke ensuite chaque transformée de Fourier dans une liste appelée FFTS
             bottom+=floor(self.fs/self.FPS)
             top+=floor(self.fs/self.FPS)
+            self.compteur +=1
+
 
         #on normalise l'ensemble des valeurs
         max=np.amax(FFTS[0])

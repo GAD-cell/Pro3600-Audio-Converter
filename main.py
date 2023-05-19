@@ -2,6 +2,7 @@ import tkinter as tk
 import customtkinter as ct
 from __Init_AC__ import*
 from PIL import Image,ImageTk
+import threading
 
 class Interface():
     def __init__(self):
@@ -11,6 +12,7 @@ class Interface():
         self.label1 = None
         self.frame=None
         self.directory = None
+        self.percentage = None
 
     def window_init(self):
         ct.set_appearance_mode("dark")
@@ -25,7 +27,7 @@ class Interface():
         label.pack(pady=12,padx=10)
 
         button_1 = ct.CTkButton(master=self.frame,
-                                        text="Input",
+                                        text="Input Path",
                                         corner_radius=8,
                                         command=self.browser_function)
         button_1.pack(padx=20,pady=20)
@@ -34,7 +36,7 @@ class Interface():
         self.label1.pack(padx=20,pady=5)
         
         button_3 = ct.CTkButton(master=self.frame,
-                                text="Output",
+                                text="Output Path",
                                 corner_radius=8,
                                 command=self.output_function)
         button_3.pack(padx=20,pady=50)
@@ -48,8 +50,8 @@ class Interface():
                                         command=self.launch_function)
         button_2.pack(padx=20,pady=60)
         
-        percentage = ct.CTkLabel(self.frame, text="0%")
-        percentage.pack()
+        self.percentage = ct.CTkLabel(self.frame, text="0%")
+        self.percentage.pack()
         progressbar = ct.CTkProgressBar(self.frame,width=400)
         progressbar.set(0)
         progressbar.pack()
@@ -66,13 +68,18 @@ class Interface():
     
     def output_function(self):
         self.directory = tk.filedialog.askdirectory()
-        print(self.directory)
         if self.file != None :
             self.ac.output_path = self.directory
             self.label2.configure(text=self.directory)
     
+    def progress(self):
+        while self.ac.compteur < self.ac.FPS*len(self.ac.f)/self.ac.fs :
+            self.percentage.configure(text = str(self.ac.progress()*100) + "%")
     def launch_function(self):
-        self.ac.image_generator(4000,version=2,windowing=True) 
+        t1 = threading.Thread(target=self.ac.image_generator(4000,version=2,windowing=True))
+        t2 = threading.Thread(target=self.progress())
+        t1.start()
+        t2.start()
         self.ac.images_to_video(image_folder_path="./Image_gen",extension=".png",video_name="test_interface",output_format=".mp4", audioclip=self.file)
 
 interface = Interface()
