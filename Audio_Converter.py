@@ -15,6 +15,8 @@ class AC(): #Audio Converter
         self.f=f
         self.window_size = window_size               #définition de la taille de la fenêtre utilisée pour l'analyse
         self.notes=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] #définit une liste de notes avec les noms des notes de la gamme chromatique occidentale standard
+        self.output_path = None
+        self.progress = 0
     
     def normalize(self,f):           #normalise les amplitudes de l'audio en divisant chaque amplitude par la valeur maximale de l'audio     
         for i in range(len(f)):      #recherche de la valeur maximale de f
@@ -212,7 +214,7 @@ class AC(): #Audio Converter
         audioclip = AudioFileClip(audioclip)
         new_audioclip = CompositeAudioClip([audioclip])      #on crée un objet CompositeAudioClip avec cet audio chargé
         videoclip.audio = new_audioclip                      #on associe finalement l'objet CompositeAudioClip à la vidéo créée précédemment à l'aide de videoclip.audio
-        videoclip.write_videofile("./Video_gen/"+video_name+"_with_sound"+output_format)                            #on écrit ensuite cette nouvelle vidéo, avec l'audio intégré, dans un fichier dans le dossier "./Video_gen/" sous le nom et le format spécifiés
+        videoclip.write_videofile(self.output_path + video_name +"_with_sound"+output_format)                            #on écrit ensuite cette nouvelle vidéo, avec l'audio intégré, dans un fichier dans le dossier "./Video_gen/" sous le nom et le format spécifiés
 
 
     
