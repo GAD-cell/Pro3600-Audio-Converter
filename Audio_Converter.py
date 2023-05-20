@@ -6,6 +6,7 @@ from math import*
 import moviepy.video.io.ImageSequenceClip
 from moviepy.editor import *
 import os
+from music21 import*
 
 class AC(): #Audio Converter
 
@@ -17,6 +18,7 @@ class AC(): #Audio Converter
         self.notes=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] #définit une liste de notes avec les noms des notes de la gamme chromatique occidentale standard
         self.output_path = None
         self.compteur = 0
+        self.chiffrage=None
     
     def progress(self):
         time=len(self.f)/self.fs
@@ -169,6 +171,26 @@ class AC(): #Audio Converter
                 rythme= (temps/(60/bpm))*(4/chiffrement[1])
                 séquence[i].append([note,rythme])
         return(séquence)
+    
+    def get_partition(f):
+        s = stream.Stream()
+        ts = meter.TimeSignature(self.chiffrage)
+        s.append(ts)
+        for i in range (len(f)):
+            if len(f[i]) == 0 :
+                n = note.Rest()
+            elif len(f[i]) == 1 :
+                n = note.Note(f[i][0][0], duration=duration.Duration(f[i][0][1]))
+
+            else :
+                accord = []
+                for j in range (len(f[i])):
+                    m = note.Note(f[i][j][0], duration=duration.Duration(f[i][j][1]))
+                    accord.append(m)
+                n = chord.Chord(accord)
+            s.append(n)
+        s.write('midi', fp='./my_melody2.midi')
+
 
     def visualize(self,f):      #visualise le fichier audio sur une partie de la bande son
         f=self.normalize(f) 
