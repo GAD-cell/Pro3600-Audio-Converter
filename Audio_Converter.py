@@ -205,16 +205,19 @@ class AC(): #Audio Converter
 
         cleaned_sequence = []
 
-        # Nettoyage de la séquence de rythme: on enlève les séquences vides et les notes de trop faibles durées
+        # Nettoyage de la séquence de rythme: on enlève les séquences vides, les notes de trop faibles durées et les silences en début de partition
+        detecteur = 0
         for i in range(len(séquence)):
             if len(séquence[i]) != 0:
                 for j in range(len(séquence[i])):
                     if len(séquence[i][j]) > 1 and séquence[i][j][1] < 1 / 16:
                         del séquence[i][j]
-
-            if len(séquence[i]) != 0:
+            if detecteur == 0:
+                if len(séquence[i]) != 0 and len(séquence[i][0]) == 2 
+                    detecteur = 1
+            if len(séquence[i]) != 0 and detecteur == 1 :
                 cleaned_sequence.append(séquence[i])
-
+        print(cleaned_sequence)
         return cleaned_sequence
 
     def get_partition(self, f):
