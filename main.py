@@ -13,50 +13,56 @@ class Interface():
         self.frame=None
         self.directory = None
         self.percentage = None
+        self.tempo=None
 
     def window_init(self):
+        # Définit le mode d'apparence en mode sombre
         ct.set_appearance_mode("dark")
+        # Définit le thème de couleur par défaut en bleu foncé
         ct.set_default_color_theme("dark-blue")
+        # Définit la taille de la fenêtre racine
         self.root.geometry("1100x700")
+        # Crée un cadre Tkinter à l'intérieur de la fenêtre racine
         self.frame = ct.CTkFrame(master=self.root)
-        self.frame.pack(pady=20,padx=20,fill="both", expand=True)
-        img= ct.CTkImage(dark_image=Image.open("./Audio_covnerter.png"),size=(961,124))
+        self.frame.pack(pady=20, padx=20, fill="both", expand=True)
 
-        #resized = img.resize((961,124))
-        label = ct.CTkLabel(master=self.frame, text= "" ,image=img )
-        label.pack(pady=12,padx=10)
+        # Charge une image à partir d'un fichier
+        img = ct.CTkImage(dark_image=Image.open("./Audio_covnerter.png"), size=(961, 124))
 
-        button_1 = ct.CTkButton(master=self.frame,
-                                        text="Input Path",
-                                        corner_radius=8,
-                                        command=self.browser_function)
-        button_1.pack(padx=20,pady=20)
-        
+        # Crée une étiquette avec l'image chargée
+        label = ct.CTkLabel(master=self.frame, text="", image=img)
+        label.pack(pady=12, padx=10)
+
+        # Crée un bouton pour sélectionner le chemin d'entrée
+        button_1 = ct.CTkButton(master=self.frame, text="Chemin d'entrée", corner_radius=8, command=self.browser_function)
+        button_1.pack(padx=20, pady=20)
+
+        # Crée une étiquette pour afficher le chemin d'entrée sélectionné
         self.label1 = ct.CTkLabel(self.frame, text="")
-        self.label1.pack(padx=20,pady=5)
-        
-        button_3 = ct.CTkButton(master=self.frame,
-                                text="Output Path",
-                                corner_radius=8,
-                                command=self.output_function)
-        button_3.pack(padx=20,pady=50)
-        
+        self.label1.pack(padx=20, pady=5)
+
+        # Crée un bouton pour sélectionner le chemin de sortie
+        button_3 = ct.CTkButton(master=self.frame, text="Chemin de sortie", corner_radius=8, command=self.output_function)
+        button_3.pack(padx=20, pady=50)
+
+        # Crée une étiquette pour afficher le chemin de sortie sélectionné
         self.label2 = ct.CTkLabel(self.frame, text="")
-        self.label2.pack(padx=20,pady=5)
-        
-        button_2 = ct.CTkButton(master=self.frame,
-                                        text="Conversion",
-                                        corner_radius=8,
-                                        command=self.launch_function)
-        button_2.pack(padx=20,pady=60)
-        
+        self.label2.pack(padx=20, pady=5)
+
+        # Crée un bouton pour lancer la conversion
+        button_2 = ct.CTkButton(master=self.frame, text="Conversion", corner_radius=8, command=self.launch_function)
+        button_2.pack(padx=20, pady=60)
+
+        # Crée une étiquette pour afficher le pourcentage de progression
         self.percentage = ct.CTkLabel(self.frame, text="0%")
         self.percentage.pack()
-        progressbar = ct.CTkProgressBar(self.frame,width=400)
+
+        # Crée une barre de progression
+        progressbar = ct.CTkProgressBar(self.frame, width=400)
         progressbar.set(0)
         progressbar.pack()
 
-
+        # Lance la boucle principale de l'interface utilisateur
         self.root.mainloop()
 
     def browser_function(self):
@@ -64,7 +70,7 @@ class Interface():
         if self.file != None :
             self.file = self.file.name
             self.label1.configure(text=self.file)
-        self.ac= Initialize(self.file)
+        self.ac, self.tempo= Initialize(self.file)
     
     def output_function(self):
         self.directory = tk.filedialog.askdirectory()
@@ -76,11 +82,10 @@ class Interface():
         while self.ac.compteur < self.ac.FPS*len(self.ac.f)/self.ac.fs :
             self.percentage.configure(text = str(self.ac.progress()*100) + "%")
     def launch_function(self):
-        t1 = threading.Thread(target=self.ac.image_generator(4000,version=2,windowing=True))
-        t2 = threading.Thread(target=self.progress())
-        t1.start()
-        t2.start()
-        self.ac.images_to_video(image_folder_path="./Image_gen",extension=".png",video_name="test_interface",output_format=".mp4", audioclip=self.file)
+        print("Init")
+        analyse = self.ac.get_rythm(windowing=True,bpm=self.tempo)
+        print("analysé")
+        self.ac.get_partition(analyse)
 
 interface = Interface()
 interface.window_init()

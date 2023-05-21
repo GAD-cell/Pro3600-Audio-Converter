@@ -143,96 +143,104 @@ class AC(): #Audio Converter
             #print(note_f)
         for i in range (len(L)) :#On cherche les harmoniques de la i-ème note de la liste
             for j in range(i+1,len(L)):
-                if L[j][0] == L[i][0]:#On compare la lettre de la i-ème note avec celle de la j-ème (ex A3 est une harmmonique de A1)
+                if L[j][0] == L[i][0] and len(L[j])==len(L[i]):#On compare la lettre de la i-ème note avec celle de la j-ème (ex A3 est une harmmonique de A1)
                     if len(L[j])==3:
-                        if len(L[i])==3:
                             n= int(L[j][2])-int(L[i][2])
-                        elif len(L[i])==2:
-                            n= int(L[j][2])-int(L[i][1])
                     else : 
-                        if len(L[i])==3:
-                            n= int(L[j][1])-int(L[i][2])
-                        elif len(L[i])==2:
-                            n= int(L[j][1])-int(L[i][1])
-                    print(str(L[i])+"----"+str(L[j]))             
+                            n= int(L[j][1])-int(L[i][1])            
                     if notes_amp[L[j]]-0.10*notes_amp[L[j]] < (1/(n+1))*notes_amp[L[i]]: #On vérifie que la potentielle harmonique n'est pas une note utile en comparant son amplitude (marge d'erreur d'amplitude calculé de 10l;m!:,n%)                                           avec l'amplitude théorique qu'aurait une harmonique
                         del notes_amp[L[j]] #On enlève les harmoniques des dictionnaires et de L
                         del notes_freq[L[j]]
                         self.remove(L[j],L)
         return(notes_amp, notes_freq)
     
-    def get_rythm(self,windowing,bpm):
-            séquence = []
-            FFTS=self.analyze_V2(windowing)
-            for i in range(len(FFTS)):
-                FFTS[i]=self.no_harmonics(FFTS[i],seuil=0.2)[0]
-            compteur = 0
-            #print(FFTS)
-            for i in range(len(FFTS)):
-                séquence.append([])
-                if i<len(FFTS) and len(FFTS[i])==0 :
-                    occurence = 1
-                    compteur = i + 1
+    def get_rythm(self, windowing, bpm):
+        séquence = []  # Liste pour stocker la séquence de rythme
+        FFTS = self.analyze_V2(windowing)  # Analyse des FFTs
 
-                    while len(FFTS[compteur])==0  :
-                        occurence = occurence + 1
-                        del FFTS[compteur]
-                        if compteur==len(FFTS):
-                            break
+        # Traitement des FFTs
+        for i in range(len(FFTS)):
+            FFTS[i] = self.no_harmonics(FFTS[i], seuil=0.2)[0]
 
+        compteur = 0
 
-                    temps=occurence*(1/self.FPS)
-                    rythme= self.round_rythm((temps/(60/bpm))*(4/self.chiffrage[1]))
-                    séquence[i].append([rythme])
-                    
-                else :
-                    if i < len(FFTS) :
-                        for note,amp in FFTS[i].items():
-                            occurence = 1
-                            compteur = i + 1
-                            while note in FFTS[compteur].keys() and i<len(FFTS) :
-                                if len(FFTS[compteur])==1:
-                                    del FFTS[compteur]
-                                else :
-                                    del FFTS[compteur][note]
-                                    compteur +=1
-                                occurence = occurence + 1
-                            temps=occurence*(1/self.FPS)
-                            rythme= self.round_rythm((temps/(60/bpm))*(4/self.chiffrage[1]))
-                            séquence[i].append([note,rythme])
-            cleaned_sequence=[]
-            for i in range(len(séquence)):
-                if len(séquence[i])!=0:
-                    for j in range(len(séquence[i])):
-                        if len(séquence[i][j])>1 and séquence[i][j][1]< 1/16 :
-                                del séquence[i][j]
-                if len(séquence[i])!=0:
-                    cleaned_sequence.append(séquence[i])
-            print(cleaned_sequence)
-            return(cleaned_sequence)
-    
-    def get_partition(self,f):
-        s = stream.Stream()
-        #ts = meter.TimeSignature(str(self.chiffrage[0])+'/'+str(self.chiffrage[1]))
-        #s.append(ts)
-        for i in range (len(f)):
-            if len(f[i]) == 1 :
-                if len(f[i][0]) == 1 :
+        # Parcours des FFTs pour construire la séquence de rythme
+        for i in range(len(FFTS)):
+            séquence.append([])
+
+            if i < len(FFTS) and len(FFTS[i]) == 0:
+                # FFT vide, donc occurrence de pause
+                occurence = 1
+                compteur = i + 1
+
+                # Recherche de la durée de la pause (occurence consécutive de FFTs vides)
+                while len(FFTS[compteur]) == 0:
+                    occurence = occurence + 1
+                    del FFTS[compteur]
+
+                    if compteur == len(FFTS):
+                        break
+
+                temps = occurence * (1 / self.FPS)
+                rythme = self.round_rythm((temps / (60 / bpm)) * (4 / self.chiffrage[1]))
+                séquence[i].append([rythme])
+            else:
+                if i < len(FFTS):
+                    for note, amp in FFTS[i].items():
+                        occurence = 1
+                        compteur = i + 1
+
+                        # Recherche des occurrences consécutives de la même note
+                        while note in FFTS[compteur].keys() and i < len(FFTS):
+                            if len(FFTS[compteur]) == 1:
+                                del FFTS[compteur]
+                            else:
+                                del FFTS[compteur][note]
+                                compteur += 1
+                            occurence = occurence + 1
+
+                        temps = occurence * (1 / self.FPS)
+                        rythme = self.round_rythm((temps / (60 / bpm)) * (4 / self.chiffrage[1]))
+                        séquence[i].append([note, rythme])
+
+        cleaned_sequence = []
+
+        # Nettoyage de la séquence de rythme: on enlève les séquences vides et les notes de trop faibles durées
+        for i in range(len(séquence)):
+            if len(séquence[i]) != 0:
+                for j in range(len(séquence[i])):
+                    if len(séquence[i][j]) > 1 and séquence[i][j][1] < 1 / 16:
+                        del séquence[i][j]
+
+            if len(séquence[i]) != 0:
+                cleaned_sequence.append(séquence[i])
+
+        return cleaned_sequence
+
+    def get_partition(self, f):
+        s = stream.Stream()  # Crée un objet Stream pour stocker la partition musicale
+
+        for i in range(len(f)):
+            if len(f[i]) == 1:
+                if len(f[i][0]) == 1:
+                    # Pause
                     n = note.Rest()
-                    n.quarterLength=f[i][0][0]
-                else :
+                    n.quarterLength = f[i][0][0]
+                else:
+                    # Note unique
                     n = note.Note(f[i][0][0])
-                    n.quarterLength=f[i][0][1]
-            else :
+                    n.quarterLength = f[i][0][1]
+            else:
+                # Accord
                 accord = []
-                for j in range (len(f[i])):
-                    #print(f[i][j][0],f[i][j][1])
+                for j in range(len(f[i])):
                     m = note.Note(f[i][j][0])
-                    m.quarterLength=f[i][0][1]
+                    m.quarterLength = f[i][0][1]
                     accord.append(m)
                 n = chord.Chord(accord)
-            s.append(n)
-        s.write('xml', fp='./my_melody.xml')
+
+            s.append(n)  # Ajoute la note ou l'accord à la partition musicaleS
+            s.write('xml', fp=self.output_path + '/my_melody.xml')
 
 
     def visualize(self,f):      #visualise le fichier audio sur une partie de la bande son
