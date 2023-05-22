@@ -239,7 +239,6 @@ class AC(): #Audio Converter
             if len(séquence[i]) != 0 and detecteur == 1 :
 
                 cleaned_sequence.append(séquence[i])
-        print(cleaned_sequence)
         return cleaned_sequence
 
     def get_partition(self, f):
