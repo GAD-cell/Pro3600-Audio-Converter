@@ -7,6 +7,7 @@ import moviepy.video.io.ImageSequenceClip
 from moviepy.editor import *
 import os
 from music21 import*
+from scipy import signal
 
 class AC(): #Audio Converter
 
@@ -18,7 +19,7 @@ class AC(): #Audio Converter
         self.notes=["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] #définit une liste de notes avec les noms des notes de la gamme chromatique occidentale standard
         self.output_path = None
         self.compteur = 0
-        self.chiffrage=[3,4]
+        self.chiffrage=[4,4]
     
     def progress(self):
         time=len(self.f)/self.fs
@@ -57,12 +58,31 @@ class AC(): #Audio Converter
         return new_duration
 
 
+    def fft_calculate(self,x):
+        """Transformée de Fourier rapide (FFT) récursive"""
+        N = len(x)
 
+        # Cas de base de la récursion
+        if N <= 1:
+            return x
+
+        # Réarrangement des échantillons en ordre bit-inversé
+        indices_pairs = self.fft_calculate(x[::2])
+        indices_impairs = self.fft_calculate(x[1::2])
+
+        factor = np.exp(-2j * np.pi * np.arange(N) / N)
+        factor_impairs = factor[:N//2] * indices_impairs
+        factor_pairs = factor[N//2:] * indices_impairs
+
+        # Combinaison des résultats réarrangés
+        return np.abs(np.concatenate([indices_pairs + factor_impairs, indices_pairs + factor_pairs])).real
+    
     
     def FFT(self,f,windowing):           #on implementera notre propre algorithme FFT plus tard
         if windowing :                   #la fonction de fenêtrage est appliquée au signal et le signal fenêtré est stocké dans la liste l
             l=[]
             g=np.hanning(len(f))         #utilise la fenêtre de Hanning pour appliquer une pondération sur les échantillons de l'audio pré-chargé
+            #g=signal.windows.flattop(len(f))
             for i in range(len(f)):      #parcourt tous les échantillons de l'audio pré-chargé, multiplie chacun par la valeur de la fenêtre à son indice, et stocke les résultats dans une nouvelle liste l
                 l.append(f[i]*g[i])
             fft=np.fft.rfft(l,len(l))
@@ -115,6 +135,7 @@ class AC(): #Audio Converter
     def find_notes(self,fft,seuil):  #trouve les notes sur le spectre audio
         FREQ=[]                      #initialiser une liste vide (FREQ) pour y stocker les fréquences trouvées
         AMP={}                       #dictionnaire vide qui associera à chaque fréquence trouvée son amplitude correspondante
+        g=np.hanning(len(fft))
         for i in range(len(fft)):
             if fft[i]>seuil:
                 FREQ.append(i*self.fs/floor(self.fs*self.window_size))
@@ -148,7 +169,7 @@ class AC(): #Audio Converter
                             n= int(L[j][2])-int(L[i][2])
                     else : 
                             n= int(L[j][1])-int(L[i][1])            
-                    if notes_amp[L[j]]-0.10*notes_amp[L[j]] < (1/(n+1))*notes_amp[L[i]]: #On vérifie que la potentielle harmonique n'est pas une note utile en comparant son amplitude (marge d'erreur d'amplitude calculé de 10l;m!:,n%)                                           avec l'amplitude théorique qu'aurait une harmonique
+                    if notes_amp[L[j]]-0.2*notes_amp[L[j]] < (1/(n+1))*notes_amp[L[i]]: #On vérifie que la potentielle harmonique n'est pas une note utile en comparant son amplitude (marge d'erreur d'amplitude calculé de 10l;m!:,n%)                                           avec l'amplitude théorique qu'aurait une harmonique
                         del notes_amp[L[j]] #On enlève les harmoniques des dictionnaires et de L
                         del notes_freq[L[j]]
                         self.remove(L[j],L)
@@ -208,42 +229,45 @@ class AC(): #Audio Converter
         # Nettoyage de la séquence de rythme: on enlève les séquences vides, les notes de trop faibles durées et les silences en début de partition
         detecteur = 0
         for i in range(len(séquence)):
-            if len(séquence[i]) != 0:
+            if i+1<len(séquence) and len(séquence[i]) != 0:
                 for j in range(len(séquence[i])):
-                    if len(séquence[i][j]) > 1 and séquence[i][j][1] < 1 / 16:
+                    if j < len(séquence[i]) and len(séquence[i][j]) > 1 and séquence[i][j][1] <= 1 / 16:
                         del séquence[i][j]
             if detecteur == 0:
-                if len(séquence[i]) != 0 and len(séquence[i][0]) == 2 
+                if len(séquence[i]) != 0 and len(séquence[i][0]) == 2 :
                     detecteur = 1
             if len(séquence[i]) != 0 and detecteur == 1 :
+
                 cleaned_sequence.append(séquence[i])
         print(cleaned_sequence)
         return cleaned_sequence
 
     def get_partition(self, f):
         s = stream.Stream()  # Crée un objet Stream pour stocker la partition musicale
-
+        ts = meter.TimeSignature(str(self.chiffrage[0])+'/'+str(self.chiffrage[1]))
+        s.append(ts)
         for i in range(len(f)):
             if len(f[i]) == 1:
                 if len(f[i][0]) == 1:
+                    #pass
                     # Pause
                     n = note.Rest()
                     n.quarterLength = f[i][0][0]
                 else:
                     # Note unique
-                    n = note.Note(f[i][0][0])
-                    n.quarterLength = f[i][0][1]
+                    n = note.Note(f[i][0][0])      
+                    n.quarterLength = f[i][0][1] 
             else:
                 # Accord
                 accord = []
                 for j in range(len(f[i])):
                     m = note.Note(f[i][j][0])
-                    m.quarterLength = f[i][0][1]
+                    m.quarterLength = f[i][0][1] 
                     accord.append(m)
                 n = chord.Chord(accord)
-
+            
             s.append(n)  # Ajoute la note ou l'accord à la partition musicaleS
-            s.write('xml', fp=self.output_path + '/my_melody.xml')
+        s.write('xml', fp=self.output_path + '/my_melody.xml')
 
 
     def visualize(self,f):      #visualise le fichier audio sur une partie de la bande son
@@ -296,7 +320,7 @@ class AC(): #Audio Converter
         audioclip = AudioFileClip(audioclip)
         new_audioclip = CompositeAudioClip([audioclip])      #on crée un objet CompositeAudioClip avec cet audio chargé
         videoclip.audio = new_audioclip                      #on associe finalement l'objet CompositeAudioClip à la vidéo créée précédemment à l'aide de videoclip.audio
-        videoclip.write_videofile(self.output_path + video_name +"_with_sound"+output_format)                            #on écrit ensuite cette nouvelle vidéo, avec l'audio intégré, dans un fichier dans le dossier "./Video_gen/" sous le nom et le format spécifiés
+        videoclip.write_videofile('./Video_gen' + video_name +"_with_sound"+output_format)                            #on écrit ensuite cette nouvelle vidéo, avec l'audio intégré, dans un fichier dans le dossier "./Video_gen/" sous le nom et le format spécifiés
 
 
     

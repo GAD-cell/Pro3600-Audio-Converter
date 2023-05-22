@@ -2,7 +2,6 @@ import tkinter as tk
 import customtkinter as ct
 from __Init_AC__ import*
 from PIL import Image,ImageTk
-import threading
 
 class Interface():
     def __init__(self):
@@ -53,15 +52,6 @@ class Interface():
         button_2 = ct.CTkButton(master=self.frame, text="Conversion", corner_radius=8, command=self.launch_function)
         button_2.pack(padx=20, pady=60)
 
-        # Crée une étiquette pour afficher le pourcentage de progression
-        self.percentage = ct.CTkLabel(self.frame, text="0%")
-        self.percentage.pack()
-
-        # Crée une barre de progression
-        progressbar = ct.CTkProgressBar(self.frame, width=400)
-        progressbar.set(0)
-        progressbar.pack()
-
         # Lance la boucle principale de l'interface utilisateur
         self.root.mainloop()
 
@@ -78,9 +68,6 @@ class Interface():
             self.ac.output_path = self.directory
             self.label2.configure(text=self.directory)
     
-    def progress(self):
-        while self.ac.compteur < self.ac.FPS*len(self.ac.f)/self.ac.fs :
-            self.percentage.configure(text = str(self.ac.progress()*100) + "%")
     def launch_function(self):
         print("Init")
         analyse = self.ac.get_rythm(windowing=True,bpm=self.tempo)
