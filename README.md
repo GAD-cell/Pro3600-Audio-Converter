@@ -1,58 +1,72 @@
 # Pro3600-Audio-Converter
 
---Instructions :
+Pro3600-Audio-Converter is a project aimed at converting audio files into musical scores using spectral analysis via the Fast Fourier Transform (FFT). The program identifies the frequencies of an audio file, even with overlapping notes, and generates visual representations of the audio spectrum's evolution over time.
 
-    L'algorithme sera codé en programmation orienté objet
-    
-    On a donc un premier ficher Audio_Converter qui contient la class AC
-    cette classe contiendra toutes les fonctions de notre algorithme de conversion
+## Table of Contents
+- [Instructions](#instructions)
+- [Current State](#current-state-of-the-program)
+- [Future Developments](#future-developments)
+- [Notes and Improvements](#notes-and-improvements)
+- [Links and Resources](#links-and-resources)
 
-    Le deuxième est __Init_AC__ et il permet d'initialiser le programme, cela nous permettra notamment de faire tout les tests
-    
-    Le programme Test_FFT_Code permet de tester l'algorithme de transformer de fourier et de vérifier le taux d'erreur générer sur l'ensemble des superpositions de deux notes possible
+---
 
-    Les fichiers .wav et .mp3 dans le dossier Sound servent à faire des tests sur les fonctions
-    
-    Les dossier Image_gen et Video_gen contiennent les images et vidéos des spectres audio qui ont été générées
+## Instructions
 
---Etat actuel du programme : 
+The project is structured into several modules, each with a specific role:
 
-    Le programme est capable d'identifier les fréquences d'un fichier audio de longueurs quelconques et avec des notes superposées grâce à l'algorithme FFT.
-    
-    Il peut générer une séquence d'image représentant l'évolution temporel du spectre audio.
+### 1. **Audio_Converter**
+   - Contains the main class `AC`, which implements the core functions of the conversion algorithm.
    
-    Les images générées sont stockées dans le dossier Image_gen et sont numérotées dans l'ordre chronologique.
-    
-    Les images sont converties en fichier vidéo .mp4 avec le son correspondant afin de s'assurer de la cohérence des piques avec le son.
-    
-    L'alogrithme V2 d'analyse coupe désormais de manière plus intelligente l'audio, le signal de sortie a beaucoup moins de bruits tout en améliorant la résolution fréquentiel qui est maintenant de 4Hz pour une taille de fenêtre de 0.25sec.
+### 2. **__Init_AC__**
+   - Initializes the program and allows for testing and setup. This is used for running various tests.
 
---Evolution à venir :
+### 3. **Test_FFT_Code**
+   - Tests the FFT algorithm and verifies the error rate generated when superimposing two notes.
 
-    création d'un algorithme détéctant les harmoniques et ne les considérant pas comme des notes jouées : FAIT
-    
-    trouver une manière d'avoir le tempo des notes jouées
-    
-    Implémenter l'algorithme FFT
-    
-    Créer une interface javafx permettant d'executer le programme. 
-    Cette interface doit parcourir les fichiers de l'ordinateur, appliquer le code python à ce fichier 
-    et permettre le téléchargement du fichier en sortie du programme. 
-    
---Notes et améliorations :
-    
-    
-    Amélioration notable : les valeurs étaient normalisées sur chaque portion temporel de l'audio. La normalisation n'était donc pas représentative sur la séquence totale de l'audio lorsqu'on tout était mis à bout.
-    La solution a donc été de normaliser les valeurs uniquement après que l'entièreté des transformées de fourier ait été effectué sur toutes les séquences temporelles de l'audio
-    
-    L'audio étant coupé en séquence de 1/FPS secondes, il y avait un fort étalement des fréquences sur le spectre. Il a donc fallu procéder à un fenêtrage en utilisant la fonction Hann. Cela a nettement amélioré la précision du spectre.
-    
-    Il a fallu aussi soustraire la moyenne du signal temporel au signal d'entrée afin de s'assurer qu'aucun 'offset' n'était envoyé lors de l'execution de l'algo FFT
-   
---Liens et ressources : 
-    
-    https://www.tek.com/en/documents/primer/understanding-fft-overlap-processing-fundamentals-0
-    https://dlbeer.co.nz/articles/fftvis.html
-    https://ccrma.stanford.edu/~jos/sasp/Overlap_Add_OLA_STFT_Processing.html
-    https://newt.phys.unsw.edu.au/jw/notes.html
-    https://training.dewesoft.com/storage/pro/courses/fft-spectral-analysis.pdf
+### 4. **Sound Folder**
+   - Contains `.wav` and `.mp3` files used to test the algorithm's functionality.
+
+### 5. **Image_gen and Video_gen Folders**
+   - `Image_gen` stores generated images representing the temporal evolution of the audio spectrum.
+   - `Video_gen` contains videos created from these images, along with the corresponding audio to ensure the peaks align with the sound.
+
+---
+
+## Current State of the Program
+
+The program currently has the following capabilities:
+- **Frequency identification**: It can detect frequencies in audio files of varying lengths and with overlapping notes, using the FFT algorithm.
+- **Spectral evolution images**: The program generates a sequence of images showing the temporal progression of the audio spectrum.
+- **Video generation**: The generated images are compiled into a `.mp4` video with the corresponding audio to validate the accuracy of the spectral peaks.
+- **Improved spectral resolution**: The second version (V2) of the analysis algorithm now intelligently segments the audio, reducing noise and improving frequency resolution to 4Hz with a window size of 0.25 seconds.
+
+---
+
+## Future Developments
+
+Here are the upcoming goals and features planned for the project:
+- **Harmonic detection**: An algorithm to detect harmonics and exclude them from being identified as played notes has been implemented.
+- **Tempo detection**: Implementing a method to determine the tempo of the played notes.
+- **FFT optimization**: Further refinement of the FFT algorithm to improve accuracy and efficiency.
+- **JavaFX interface**: Creating a user-friendly JavaFX interface that will allow users to browse their computer for audio files, apply the Python algorithm, and download the output files.
+
+---
+
+## Notes and Improvements
+
+- **Normalization improvement**: Initially, values were normalized for each time segment of the audio, which did not accurately represent the entire audio sequence. Now, normalization occurs only after the Fourier transforms have been completed for all audio segments.
+- **Frequency smearing reduction**: When the audio was segmented into 1/FPS seconds, there was significant frequency smearing on the spectrum. This was mitigated by applying a Hann windowing function, which significantly improved spectral accuracy.
+- **Offset correction**: The mean of the time signal was subtracted from the input to ensure no DC offset was passed into the FFT, which could distort the results.
+
+---
+
+## Links and Resources
+
+Here are some helpful resources and references on FFT and audio spectral analysis:
+- [Tektronix: Understanding FFT and Overlap Processing](https://www.tek.com/en/documents/primer/understanding-fft-overlap-processing-fundamentals-0)
+- [FFT Visualization](https://dlbeer.co.nz/articles/fftvis.html)
+- [Stanford CCRMA: Overlap-Add STFT Processing](https://ccrma.stanford.edu/~jos/sasp/Overlap_Add_OLA_STFT_Processing.html)
+- [Physics of Music Notes](https://newt.phys.unsw.edu.au/jw/notes.html)
+- [Spectral Analysis Guide](https://training.dewesoft.com/storage/pro/courses/fft-spectral-analysis.pdf)
+
